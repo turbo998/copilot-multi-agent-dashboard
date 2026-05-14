@@ -173,9 +173,9 @@ def create_app(adapters: Optional[list[Adapter]] = None) -> FastAPI:
         all_sessions = _all_sessions_cached()
         filtered = _filter_sessions(all_sessions, source, q, 200)
         return templates.TemplateResponse(
+            request,
             'index.html',
             {
-                'request': request,
                 'sessions': filtered,
                 'source': source,
                 'q': q,
@@ -199,9 +199,9 @@ def create_app(adapters: Optional[list[Adapter]] = None) -> FastAPI:
         except Exception as e:  # pragma: no cover
             raise HTTPException(status_code=500, detail=str(e))
         return templates.TemplateResponse(
+            request,
             'session.html',
             {
-                'request': request,
                 'session': session,
                 'messages': messages,
             },
