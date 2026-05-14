@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ session.title or session.id }}{% endblock %}
+{% block content %}
+<a class="back" href="/">← back</a>
+<header class="session-head">
+  <h1>{{ session.title or session.first_user_msg or session.id }}</h1>
+  <div class="session-meta">
+    <span class="badge badge-{{ session.source }}">{{ session.source }}</span>
+    {% if session.model %}<span class="meta-item">model: {{ session.model }}</span>{% endif %}
+    <span class="meta-item">turns: {{ session.turns }}</span>
+    <span class="meta-item">created: {{ session.created_at }}</span>
+    {% if session.updated_at %}<span class="meta-item">updated: {{ session.updated_at }}</span>{% endif %}
+    {% if session.cwd %}<span class="meta-item">cwd: {{ session.cwd }}</span>{% endif %}
+  </div>
+</header>
+
+<section class="messages">
+  {% for m in messages %}
+    <article class="msg msg-{{ m.role }}">
+      <div class="msg-role">{{ m.role }}</div>
+      <pre class="msg-content">{{ m.content }}</pre>
+    </article>
+  {% else %}
+    <p class="empty">No messages.</p>
+  {% endfor %}
+</section>
+{% endblock %}

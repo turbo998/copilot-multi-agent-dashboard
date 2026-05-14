@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Agent Dashboard — Sessions{% endblock %}
+{% block content %}
+<form class="filters" method="get" action="/">
+  <div class="chips">
+    {% for s in sources %}
+      <a class="chip {% if s == source %}active{% endif %}"
+         href="/?source={{ s }}{% if q %}&q={{ q }}{% endif %}">{{ s }}</a>
+    {% endfor %}
+  </div>
+  <input type="search" name="q" value="{{ q }}" placeholder="search…" class="search">
+  {% if source and source != 'all' %}<input type="hidden" name="source" value="{{ source }}">{% endif %}
+  <button type="submit" class="btn">Go</button>
+</form>
+
+<p class="meta">{{ sessions|length }} session(s) shown ({{ total }} total)</p>
+
+<section class="cards">
+  {% for s in sessions %}
+    <a class="card" href="/session/{{ s.id }}">
+      <div class="card-header">
+        <span class="badge badge-{{ s.source }}">{{ s.source }}</span>
+        <span class="model">{{ s.model or '' }}</span>
+      </div>
+      <h3 class="card-title">{{ s.title or s.first_user_msg or '(untitled)' }}</h3>
+      <p class="card-preview">{{ s.first_user_msg }}</p>
+      <div class="card-footer">
+        <span>{{ s.turns }} turn(s)</span>
+        <span class="ts">{{ s.updated_at or s.created_at }}</span>
+      </div>
+    </a>
+  {% else %}
+    <p class="empty">No sessions found.</p>
+  {% endfor %}
+</section>
+{% endblock %}

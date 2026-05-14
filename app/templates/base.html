@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Agent Dashboard{% endblock %}</title>
+  <link rel="stylesheet" href="/static/main.css">
+</head>
+<body>
+  <header class="topnav">
+    <a class="brand" href="/">Agent Dashboard</a>
+    <div id="heartbeat-status" class="heartbeat"></div>
+  </header>
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
