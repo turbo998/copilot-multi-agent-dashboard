@@ -210,5 +210,24 @@ def create_app(adapters: Optional[list[Adapter]] = None) -> FastAPI:
     return app
 
 
-# Convenient module-level app for `uvicorn app.main:app`.
-app = create_app() if os.getenv('AGENTDASH_AUTOSTART', '0') == '1' else None
+# Module-level app for `uvicorn app.main:app`.
+# In production: pulls snapshots from Blob on startup, then refreshes in background.
+def _bootstrap_and_create() -> FastAPI:
+    if os.getenv('AGENTDASH_BLOB_URL'):
+        try:
+            from app import blob_sync
+            blob_sync.pull_once()
+        except Exception as e:
+            log.warning('initial blob pull failed: %s', e)
+    a = create_app()
+    if os.getenv('AGENTDASH_BLOB_URL'):
+        try:
+            from app import blob_sync
+            blob_sync.start_background_refresh(a)
+        except Exception as e:  # pragma: no cover
+            log.warning('failed to start blob refresh: %s', e)
+    return a
+
+
+# Always export `app` so `uvicorn app.main:app` works in container.
+app = _bootstrap_and_create()

@@ -143,6 +143,21 @@ class BlobSnapshotCache:
     def write_text(self, blob_path: str, text: str) -> None:
         self.upload(blob_path, text.encode('utf-8'), content_type='text/plain')
 
+    def list_blobs(self, prefix: str = '') -> list[str]:
+        """Return blob names under prefix."""
+        if self._local_mode:
+            root = self._local_root
+            if prefix:
+                base = root / prefix
+                if not base.exists():
+                    return []
+                return [str(p.relative_to(root)) for p in base.rglob('*') if p.is_file()]
+            return [str(p.relative_to(root)) for p in root.rglob('*') if p.is_file()]
+        try:
+            return [b.name for b in self._container_client.list_blobs(name_starts_with=prefix)]
+        except Exception as e:
+            raise RuntimeError(f"list_blobs failed for {prefix}: {e}") from e
+
     def exists(self, blob_path: str) -> bool:
         if self._local_mode:
             return self._local_path(blob_path).exists()
